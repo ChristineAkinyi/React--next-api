@@ -1,42 +1,36 @@
 "use client";
 
-import { userLogin } from '@/app/utils/userLogin';
+import { userLogin } from '@/app/api/posts/utils/userLogin';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // Import useRouter
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError]= useState('')
-    const [response, setResponse]= useState('')
-    const router = useRouter();
+    const [error, setError] = useState('');
+    const [response, setResponse] = useState('');
+    const router = useRouter(); // Initialize useRouter
 
     const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {
-            setLoading(true);
-            const loginResponse = await userLogin({ username, password });
-            // setResponse(response.message?? 'login successful')
+            // setLoading(true);
+            const response = await userLogin({ username, password });
+            setResponse(response.message ?? 'successful login');
+            router.push('/posts/hooks')
             // console.log({ response });
 
-            if(loginResponse.token) {
-                localStorage.setItem('authToken', loginResponse.token);
-
-                router.push('/post');
-            }  else {
-                setResponse(loginResponse.message ?? 'Login successful');
-            }
-
-             console.log({loginResponse});
-             
+            // // Navigate to the posts page after successful login
+            // if (response.success) { // Assuming response has a success field
+            //     router.push('/posts'); // Redirect to the posts page
+            // }
         } catch (error) {
+            setLoading(false)
             const message = (error as Error).message;
-            console.log({ message });
-            setError(message)
-        } finally {
-            setLoading(false);
-        }
+            // console.log({ message });
+            setError(message);
+        } 
     };
 
     return (
@@ -67,7 +61,6 @@ const Login = () => {
             </button>
             {response && <p className='text-green-500 text-sm'>{response}</p>}
             {error && <p className='text-red-500 mt-2'>{error}</p>}
-
         </form>
     );
 };
